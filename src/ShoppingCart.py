@@ -5,16 +5,15 @@ class ShoppingCartError(Exception):
     pass
 
 
-class ProductNotFoundError(ShoppingCartError):
-    pass
+class ProductNotFoundError(ShoppingCartError): pass
 
 
-class InvalidQuantityError(ShoppingCartError):
-    pass
+class InvalidQuantityError(ShoppingCartError): pass
 
 
-class InsufficientStockError(ShoppingCartError):
-    pass
+class InsufficientStockError(ShoppingCartError):pass
+
+class InvalidPromoCodeError(ShoppingCartError): pass
 
 
 class ShoppingCart:
@@ -22,6 +21,7 @@ class ShoppingCart:
     def __init__(self, catalog: Dict[str, Product]):
         self._catalog: Dict[str, Product] = catalog
         self._items: Dict[str, int] = {}
+        self._discount_percent = 0
 
 
     def _get_product(self, product_id: str) -> Product:
@@ -32,6 +32,12 @@ class ShoppingCart:
     @property
     def items(self) -> Dict[str, int]:
         return dict(self._items)
+
+    def apply_promo(self, code: str) -> None:
+        promos = {"SALE10": 10, "SALE20": 20}
+        if code not in promos:
+            raise InvalidPromoCodeError(f"Неизвестный промокод: {code!r}")
+        self._discount_percent = promos[code]
 
     def add_product(self, product_id: str, quantity: int) -> None:
         
@@ -77,4 +83,4 @@ class ShoppingCart:
         for product_id, qty in self._items.items():
             product = self._catalog.get(product_id)
             if product is not None: total += product.price * qty
-        return total
+        return round(total*(1-self._discount_percent/100),2)

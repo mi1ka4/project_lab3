@@ -5,6 +5,7 @@ from src.ShoppingCart import (
     ProductNotFoundError,
     InvalidQuantityError,
     InsufficientStockError,
+    InvalidPromoCodeError
 )
 
 
@@ -116,6 +117,26 @@ def test_total_price_multiple(cart):
     cart.add_product("prod_2", 3)
     assert cart.total_price() == 1000.0 + 1500.0
 
+
+def test_total_price_one_product_promocode(cart):
+    cart.add_product("prod_1", 2)
+    cart.apply_promo("SALE10")
+    assert cart.total_price() == 1800.0
+    cart.apply_promo("SALE20")
+    assert cart.total_price() == 1600.0
+
+
+def test_total_price_multiple_promocode(cart):
+    cart.add_product("prod_1", 1)
+    cart.add_product("prod_2", 3)
+    cart.apply_promo("SALE10")
+    assert cart.total_price() == round((1000.0 + 1500.0)*(1-10/100),2)
+    cart.apply_promo("SALE20")
+    assert cart.total_price() == round((1000.0 + 1500.0)*(1-20/100),2)
+
+def test_promocode_apply_error(cart):
+    with pytest.raises(InvalidPromoCodeError):
+        cart.apply_promo("SALE100")
 
 
 def test_items_returns_copy(cart):
