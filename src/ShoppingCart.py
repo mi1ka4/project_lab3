@@ -56,12 +56,12 @@ class ShoppingCart:
         if product_id not in self._items:
             raise ProductNotFoundError(f"Товара с id={product_id!r} нет в корзине")
 
+        
+        if quantity <= 0: raise InvalidQuantityError("Количество должно быть положительным")
+        
         if quantity is None:
             del self._items[product_id]
             return
-        if quantity <= 0: raise InvalidQuantityError("Количество должно быть положительным")
-        
-        
 
         
 
